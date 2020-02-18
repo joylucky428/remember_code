@@ -1,0 +1,8 @@
+# IDE
+.idea
+
+# bin files
+remember_code_linux
+
+# configrations
+config/config.go

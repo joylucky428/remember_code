@@ -56,3 +56,12 @@ func (h *MongoHandler) AddCode(c model.Code) ([]byte, error) {
 	}
 	return []byte(c.ID), s.DB(DATABASE_NAME).C(CODE_COLL_NAME).Insert(c)
 }
+
+// ID로 코드 검색
+func (h *MongoHandler) GetCode(id []byte) (model.Code, error) {
+	s := h.getFreshSession()
+	defer s.Close()
+	c := model.Code{}
+	err := s.DB(DATABASE_NAME).C(CODE_COLL_NAME).FindId(bson.ObjectId(id)).One(&c)
+	return c, err
+}

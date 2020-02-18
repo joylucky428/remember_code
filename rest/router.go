@@ -16,6 +16,7 @@ func NewRouter(dh db.DatabaseHandler) *mux.Router {
 	codeRouter := r.PathPrefix("/codes").Subrouter()
 	codeRouter.Methods("GET").Path("").HandlerFunc(codeHandler.GetCodeList)
 	codeRouter.Methods("POST").Path("").HandlerFunc(codeHandler.AddCode)
+	codeRouter.Methods("GET").Path("/{id}").HandlerFunc(codeHandler.GetCode)
 
 	return r
 }

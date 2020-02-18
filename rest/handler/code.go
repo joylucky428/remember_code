@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"remember_code/db"
@@ -50,5 +52,30 @@ func (h *CodeHandler) AddCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json;charset=utf8")
 	fmt.Fprintf(w, "{result: success, id: %s}", id)
+}
+
+// id 로 코드를 검색하여 반환.
+func (h *CodeHandler) GetCode(w http.ResponseWriter, r *http.Request) {
+	// 파라미터 파싱
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		w.WriteHeader(400)
+		fmt.Fprint(w, `{error: No code id}`)
+		return
+	}
+
+	// 코드 가져오기
+	idBytes, err := hex.DecodeString(id)
+	c, err := h.dbHandler.GetCode(idBytes)
+	if err != nil {
+		fmt.Fprintf(w, "{error occured when fetching code %s %s}", id, err)
+		return
+	}
+
+	// Write response
+	w.Header().Set("Content-Type", "application/json;charset=utf8")
+	json.NewEncoder(w).Encode(&c)
 }

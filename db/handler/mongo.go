@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"log"
 	"remember_code/model"
 )
@@ -27,6 +29,7 @@ func NewMongoHandler(connection string) (*MongoHandler, error) {
 	return handler, err
 }
 
+
 func (h *MongoHandler) getFreshSession() *mgo.Session {
 	return h.session.Copy()
 }
@@ -40,4 +43,16 @@ func (h *MongoHandler) GetCodeList() ([]model.Code, error) {
 	var codes []model.Code
 	err := s.DB(DATABASE_NAME).C(CODE_COLL_NAME).Find(nil).All(&codes)
 	return codes, err
+}
+
+// 새로운 코드를 추가하고 ID를 반환한다.
+func (h *MongoHandler) AddCode(c model.Code) ([]byte, error) {
+	fmt.Println("mongo add....")
+
+	s := h.getFreshSession()
+	defer s.Close()
+	if !c.ID.Valid() {
+		c.ID = bson.NewObjectId()
+	}
+	return []byte(c.ID), s.DB(DATABASE_NAME).C(CODE_COLL_NAME).Insert(c)
 }

@@ -1,17 +1,19 @@
 version: "3.6"
 services:
   remember_code:
-    build: "."
+    build: "../.."
     restart: always
     ports:
       - "8080"
+    container_name: "remember_code_rest"
   nginx:
-    build: "./nginx"
+    build: "../../nginx"
     restart: always
     ports:
       - "80:80"
     depends_on:
       - "remember_code"
+    container_name: "nginx"
   mongo:
     image: "mongo"
     restart: always

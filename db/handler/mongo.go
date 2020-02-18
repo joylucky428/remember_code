@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"fmt"
 	"gopkg.in/mgo.v2"
+	"log"
 	"remember_code/model"
 )
 
@@ -33,17 +33,11 @@ func (h *MongoHandler) getFreshSession() *mgo.Session {
 
 
 func (h *MongoHandler) GetCodeList() ([]model.Code, error) {
-	fmt.Println("mongo...?")
-	var cl []model.Code
+	log.Println("mongo : GetCodeList")
 
-	newCode := model.Code{
-		Title:       "Sample Code",
-		Description: "Golang code",
-		CodeType:    "Go",
-		CodeString:  "fmt.Println(\"hello world\")",
-	}
-
-	cl = append(cl, newCode)
-
-	return cl, nil
+	s := h.getFreshSession()
+	defer s.Close()
+	var codes []model.Code
+	err := s.DB(DATABASE_NAME).C(CODE_COLL_NAME).Find(nil).All(&codes)
+	return codes, err
 }

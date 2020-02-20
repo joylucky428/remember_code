@@ -58,24 +58,49 @@ func (h *CodeHandler) AddCode(w http.ResponseWriter, r *http.Request) {
 
 // id 로 코드를 검색하여 반환.
 func (h *CodeHandler) GetCode(w http.ResponseWriter, r *http.Request) {
-	// 파라미터 파싱
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		w.WriteHeader(400)
-		fmt.Fprint(w, `{error: No code id}`)
-		return
-	}
-
-	// 코드 가져오기
-	idBytes, err := hex.DecodeString(id)
-	c, err := h.dbHandler.GetCode(idBytes)
-	if err != nil {
-		fmt.Fprintf(w, "{error occured when fetching code %s %s}", id, err)
+	c, errMsg := h.getCodeByIdFromRequest(r)
+	if errMsg != "" {
+		fmt.Fprintf(w, errMsg)
 		return
 	}
 
 	// Write response
 	w.Header().Set("Content-Type", "application/json;charset=utf8")
 	json.NewEncoder(w).Encode(&c)
+}
+
+func (h *CodeHandler) getCodeByIdFromRequest(r *http.Request) (model.Code, string) {
+	// 파라미터 파싱
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return model.Code{}, "{error: No code id}"
+	}
+
+	// 코드 가져오기
+	idBytes, err := hex.DecodeString(id)
+	c, err := h.dbHandler.GetCode(idBytes)
+	if err != nil {
+		return model.Code{}, "{error occured when fetching code}"
+	}
+
+	return c, ""
+}
+
+func (h *CodeHandler) DeleteCode(w http.ResponseWriter, r *http.Request) {
+	c, errMsg := h.getCodeByIdFromRequest(r)
+	if errMsg != "" {
+		fmt.Fprintf(w, errMsg)
+		return
+	}
+
+	err := h.dbHandler.DeleteCode(c)
+	if err != nil {
+		fmt.Fprintf(w, "{error occured when deleting code %s}", err)
+		return
+	}
+
+	// Write response
+	w.Header().Set("Content-Type", "application/json;charset=utf8")
+	fmt.Fprintf(w, "{result: 'success'}")
 }

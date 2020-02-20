@@ -18,6 +18,7 @@ func NewRouter(dh db.DatabaseHandler) http.Handler {
 	codeRouter.Methods("GET").Path("").HandlerFunc(codeHandler.GetCodeList)
 	codeRouter.Methods("POST").Path("").HandlerFunc(codeHandler.AddCode)
 	codeRouter.Methods("GET").Path("/{id}").HandlerFunc(codeHandler.GetCode)
+	codeRouter.Methods("DELETE").Path("/{id}").HandlerFunc(codeHandler.DeleteCode)
 
 	return corsMiddleware(r)
 }

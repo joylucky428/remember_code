@@ -65,3 +65,11 @@ func (h *MongoHandler) GetCode(id []byte) (model.Code, error) {
 	err := s.DB(DATABASE_NAME).C(CODE_COLL_NAME).FindId(bson.ObjectId(id)).One(&c)
 	return c, err
 }
+
+// ID로 코드 삭제
+func (h *MongoHandler) DeleteCode(c model.Code) error {
+	s := h.getFreshSession()
+	defer s.Close()
+	err := s.DB(DATABASE_NAME).C(CODE_COLL_NAME).Remove(c)
+	return err
+}

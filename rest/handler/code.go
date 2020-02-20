@@ -23,6 +23,7 @@ func (h *CodeHandler) GetCodeList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(cl)
+	setCORSAllow(&w)
 	json.NewEncoder(w).Encode(&cl)
 }
 
@@ -53,6 +54,7 @@ func (h *CodeHandler) AddCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json;charset=utf8")
+	setCORSAllow(&w)
 	fmt.Fprintf(w, "{result: success, id: %s}", id)
 }
 
@@ -77,5 +79,6 @@ func (h *CodeHandler) GetCode(w http.ResponseWriter, r *http.Request) {
 
 	// Write response
 	w.Header().Set("Content-Type", "application/json;charset=utf8")
+	setCORSAllow(&w)
 	json.NewEncoder(w).Encode(&c)
 }
